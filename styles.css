@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #0e0f1a;
   --bg-soft: #16182a;
   --panel: #1c1f33;
@@ -92,7 +92,7 @@ body {
 .settings-link { text-align: start; padding: 2px 0; }
 
 /* ---------- Main ---------- */
-.main { padding: 26px 32px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.main { padding: 26px 32px; display: flex; flex-direction: column; gap: 18px; min-width: 0; height: 100%; overflow: hidden; }
 
 .status-bar { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -180,3 +180,4 @@ kbd { background: var(--panel-2); border: 1px solid var(--border); border-radius
   .sidebar { display: none; }
   .main { padding: 18px; }
 }
+
