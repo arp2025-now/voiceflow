@@ -249,17 +249,10 @@ async function transcribeWithWhisper(key) {
   const blob = new Blob(recordedChunks, { type: "audio/webm" });
   const form = new FormData();
   form.append("file", blob, "audio.webm");
-  form.append("model", "whisper-1");
+  form.append("model", "gpt-4o-transcribe");
   form.append("temperature", "0");
   const lang = el.langSelect.value.split("-")[0];
   if (lang) form.append("language", lang);
-  const prompts = {
-    "he": "שלום. זהו תמלול דיבור בעברית.",
-    "en": "Hello. This is a speech transcription in English.",
-    "ar": "مرحبا. هذا نص كلام باللغة العربية.",
-  };
-  const prompt = prompts[lang] || prompts["he"];
-  form.append("prompt", prompt);
   try {
     const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST", headers: { Authorization: "Bearer " + key }, body: form,
