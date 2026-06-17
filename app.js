@@ -223,7 +223,7 @@ function startWhisper() {
   const recCtx = new (window.AudioContext || window.webkitAudioContext)();
   const src = recCtx.createMediaStreamSource(audioStream);
   const gain = recCtx.createGain();
-  gain.gain.value = 3.0;
+  gain.gain.value = 1.4;
   const dest = recCtx.createMediaStreamDestination();
   src.connect(gain);
   gain.connect(dest);
@@ -255,8 +255,16 @@ async function transcribeWithWhisper(key) {
   const form = new FormData();
   form.append("file", blob, "audio.webm");
   form.append("model", "whisper-1");
+  form.append("temperature", "0");
   const lang = el.langSelect.value.split("-")[0];
   if (lang) form.append("language", lang);
+  const prompts = {
+    "he": "שלום. זהו תמלול דיבור בעברית.",
+    "en": "Hello. This is a speech transcription in English.",
+    "ar": "مرحبا. هذا نص كلام باللغة العربية.",
+  };
+  const prompt = prompts[lang] || prompts["he"];
+  form.append("prompt", prompt);
   try {
     const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST", headers: { Authorization: "Bearer " + key }, body: form,
