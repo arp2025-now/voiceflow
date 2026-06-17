@@ -147,10 +147,8 @@ async function stopRecording() {
   if (recognition) { try { recognition.stop(); } catch (_) {} }
   if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
   if (audioStream) { audioStream.getTracks().forEach((t) => t.stop()); audioStream = null; }
-  if (el.engineSelect.value === "browser") {
-    setStatus("done", "הסתיים");
-    finalizeTranscript();
-  }
+  // For browser engine: finalizeTranscript is called from recognition.onend
+  // after the API delivers all final results
 }
 
 function finalizeTranscript() {
@@ -202,7 +200,12 @@ function startBrowserRecognition() {
     else toast("שגיאת תמלול: " + e.error);
   };
   recognition.onend = () => {
-    if (recording) { try { recognition.start(); } catch (_) {} }
+    if (recording) {
+      try { recognition.start(); } catch (_) {}
+    } else {
+      setStatus("done", "הסתיים");
+      finalizeTranscript();
+    }
   };
   recognition.start();
 }
