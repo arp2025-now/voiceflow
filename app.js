@@ -249,7 +249,7 @@ async function transcribeWithWhisper(key) {
   const blob = new Blob(recordedChunks, { type: "audio/webm" });
   const form = new FormData();
   form.append("file", blob, "audio.webm");
-  form.append("model", "gpt-4o-transcribe");
+  form.append("model", "whisper-1");
   form.append("temperature", "0");
   const lang = el.langSelect.value.split("-")[0];
   if (lang) form.append("language", lang);
