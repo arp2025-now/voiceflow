@@ -226,10 +226,15 @@ function startWhisper() {
     : "";
   const opts = mimeType ? { mimeType, audioBitsPerSecond: 128000 } : {};
   mediaRecorder = new MediaRecorder(audioStream, opts);
-  mediaRecorder.ondataavailable = (e) => { if (e.data.size) recordedChunks.push(e.data); };
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size) recordedChunks.push(e.data);
+  };
   mediaRecorder.onstop = () => {
-    if (recordedChunks.length === 0) {
-      toast("לא נקלט אודיו — בדקי הרשאות מיקרופון");
+    const totalSize = recordedChunks.reduce((s, c) => s + c.size, 0);
+    console.log("chunks:", recordedChunks.length, "size:", totalSize);
+    toast("אודיו: " + recordedChunks.length + " חלקים, " + Math.round(totalSize/1024) + "KB — שולח...");
+    if (recordedChunks.length === 0 || totalSize < 1000) {
+      toast("לא נקלט אודיו (" + totalSize + "B) — נסי לרענן ולאשר מיקרופון");
       setStatus("idle", "מוכן להקלטה");
       return;
     }
