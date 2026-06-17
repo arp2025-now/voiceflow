@@ -219,28 +219,18 @@ function startWhisper() {
   if (!key) { toast("יש להזין מפתח OpenAI API בהגדרות."); openModal(); stopRecording(); return; }
   recordedChunks = [];
 
-  // Boost mic volume before recording to reduce Whisper hallucinations
-  const recCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const src = recCtx.createMediaStreamSource(audioStream);
-  const gain = recCtx.createGain();
-  gain.gain.value = 1.4;
-  const dest = recCtx.createMediaStreamDestination();
-  src.connect(gain);
-  gain.connect(dest);
-
   const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
     ? "audio/webm;codecs=opus"
     : MediaRecorder.isTypeSupported("audio/webm")
     ? "audio/webm"
     : "";
-  const opts = mimeType ? { mimeType, audioBitsPerSecond: 128000 } : { audioBitsPerSecond: 128000 };
-  mediaRecorder = new MediaRecorder(dest.stream, opts);
+  const opts = mimeType ? { mimeType, audioBitsPerSecond: 128000 } : {};
+  mediaRecorder = new MediaRecorder(audioStream, opts);
   mediaRecorder.ondataavailable = (e) => { if (e.data.size) recordedChunks.push(e.data); };
   mediaRecorder.onstop = () => {
-    recCtx.close();
-    const duration = Date.now() - startedAt;
-    if (duration < 1500) {
-      toast("ההקלטה קצרה מדי — דברו לפחות שנייה-שתיים");
+    if (recordedChunks.length === 0) {
+      toast("לא נקלט אודיו — בדקי הרשאות מיקרופון");
+      setStatus("idle", "מוכן להקלטה");
       return;
     }
     transcribeWithWhisper(key);
