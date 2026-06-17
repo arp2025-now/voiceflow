@@ -243,12 +243,52 @@ function startWhisper() {
   mediaRecorder.start(500);
 }
 
+async function audioToWav(chunks, mimeType) {
+  const rawBlob = new Blob(chunks, { type: mimeType || "audio/webm" });
+  const arrayBuffer = await rawBlob.arrayBuffer();
+  const decodeCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+  let audioBuffer;
+  try {
+    audioBuffer = await decodeCtx.decodeAudioData(arrayBuffer);
+  } finally {
+    decodeCtx.close();
+  }
+  const samples = audioBuffer.getChannelData(0);
+  const wavBuffer = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(wavBuffer);
+  const sr = audioBuffer.sampleRate;
+  function ws(off, s) { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); }
+  ws(0, "RIFF"); view.setUint32(4, 36 + samples.length * 2, true);
+  ws(8, "WAVE"); ws(12, "fmt ");
+  view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true); view.setUint32(24, sr, true);
+  view.setUint32(28, sr * 2, true); view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true); ws(36, "data");
+  view.setUint32(40, samples.length * 2, true);
+  let off = 44;
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    off += 2;
+  }
+  return new Blob([wavBuffer], { type: "audio/wav" });
+}
+
 async function transcribeWithWhisper(key) {
-  setStatus("processing", "⏳ שולח ל-Whisper, רגע…");
+  setStatus("processing", "⏳ ממיר ושולח ל-Whisper…");
   toast("שולח ל-Whisper — ממתינה לתוצאה…");
-  const blob = new Blob(recordedChunks, { type: "audio/webm" });
+  const mimeType = mediaRecorder ? mediaRecorder.mimeType : "audio/webm";
+  let fileBlob, fileName;
+  try {
+    fileBlob = await audioToWav(recordedChunks, mimeType);
+    fileName = "audio.wav";
+  } catch (e) {
+    fileBlob = new Blob(recordedChunks, { type: mimeType });
+    fileName = "audio.webm";
+    console.warn("WAV conversion failed, sending raw:", e);
+  }
   const form = new FormData();
-  form.append("file", blob, "audio.webm");
+  form.append("file", fileBlob, fileName);
   form.append("model", "whisper-1");
   form.append("temperature", "0");
   const lang = el.langSelect.value.split("-")[0];
