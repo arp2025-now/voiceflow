@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceFlow · הקלטה ותמלול קולי</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">🎙️</div>
+        <div class="brand-text">
+          <h1>VoiceFlow</h1>
+          <span>הקלטה ותמלול חכם</span>
+        </div>
+      </div>
+
+      <button id="newBtn" class="new-btn">+ תמלול חדש</button>
+
+      <div class="history">
+        <div class="history-head">
+          <span>היסטוריה</span>
+          <button id="clearHistoryBtn" class="link-btn" title="נקה הכל">נקה</button>
+        </div>
+        <ul id="historyList" class="history-list"></ul>
+        <p id="historyEmpty" class="history-empty">עדיין אין תמלולים שמורים</p>
+      </div>
+
+      <div class="sidebar-footer">
+        <label class="field">
+          <span>שפת תמלול</span>
+          <select id="langSelect">
+            <option value="he-IL" selected>עברית</option>
+            <option value="en-US">English</option>
+            <option value="ar-SA">العربية</option>
+            <option value="ru-RU">Русский</option>
+            <option value="es-ES">Español</option>
+            <option value="fr-FR">Français</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>מנוע תמלול</span>
+          <select id="engineSelect">
+            <option value="browser">מובנה בדפדפן (מיידי, חינם)</option>
+            <option value="whisper" selected>OpenAI Whisper (דיוק גבוה)</option>
+          </select>
+        </label>
+        <label class="checkbox-field">
+          <input id="autoCopyToggle" type="checkbox" checked />
+          <span>העתק אוטומטית בסיום (להדבקה בקלוד וכו')</span>
+        </label>
+        <button id="settingsBtn" class="link-btn settings-link">⚙️ הגדרות מפתח API</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="status-bar">
+        <div id="statusDot" class="status-dot idle"></div>
+        <span id="statusText">מוכן להקלטה</span>
+        <span id="timer" class="timer">00:00</span>
+      </div>
+
+      <div class="transcript-wrap">
+        <div id="transcript" class="transcript" contenteditable="true"
+             data-placeholder="לחצו על כפתור המיקרופון והתחילו לדבר — הטקסט יופיע כאן בזמן אמת…"></div>
+        <span id="interim" class="interim"></span>
+      </div>
+
+      <!-- Visualizer -->
+      <canvas id="visualizer" class="visualizer" height="64"></canvas>
+
+      <!-- Controls -->
+      <div class="controls">
+        <div class="left-tools">
+          <button id="copyBtn" class="tool-btn" title="העתק">📋 העתק</button>
+          <button id="downloadBtn" class="tool-btn" title="הורד">⬇️ הורד</button>
+          <button id="cleanBtn" class="tool-btn" title="שפר פורמט">✨ שפר</button>
+          <button id="clearTextBtn" class="tool-btn" title="מחק טקסט">🗑️ מחק</button>
+        </div>
+
+        <button id="recordBtn" class="record-btn" aria-label="הקלטה">
+          <span class="mic-icon">🎤</span>
+          <span class="rec-ring"></span>
+        </button>
+
+        <div class="right-tools">
+          <span id="wordCount" class="word-count">0 מילים</span>
+        </div>
+      </div>
+
+      <p class="hint">טיפ: לחצו על מקש <kbd>רווח</kbd> כדי להתחיל הקלטה — לחצו שוב כדי לסיים</p>
+    </main>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>הגדרות Whisper API</h2>
+      <p class="modal-desc">
+        לתמלול בדיוק גבוה ניתן להשתמש ב-OpenAI Whisper. המפתח נשמר מקומית בדפדפן בלבד
+        ונשלח ישירות ל-OpenAI — הוא לא עובר דרך אף שרת אחר.
+      </p>
+      <label class="field">
+        <span>OpenAI API Key</span>
+        <input id="apiKeyInput" type="password" placeholder="sk-..." />
+      </label>
+      <div class="modal-actions">
+        <button id="saveKeyBtn" class="primary-btn">שמור</button>
+        <button id="closeModalBtn" class="secondary-btn">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
