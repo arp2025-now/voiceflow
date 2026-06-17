@@ -90,9 +90,9 @@ function startVisualizer(stream) {
   const canvas = el.visualizer;
   const ctx = canvas.getContext("2d");
   const data = new Uint8Array(analyser.frequencyBinCount);
+  canvas.width = canvas.clientWidth || 800;
   function draw() {
     vizRAF = requestAnimationFrame(draw);
-    canvas.width = canvas.clientWidth;
     analyser.getByteFrequencyData(data);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const bars = 48;
