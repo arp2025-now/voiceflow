@@ -218,10 +218,23 @@ function startWhisper() {
   const key = localStorage.getItem(LS_KEY);
   if (!key) { toast("יש להזין מפתח OpenAI API בהגדרות."); openModal(); stopRecording(); return; }
   recordedChunks = [];
-  mediaRecorder = new MediaRecorder(audioStream);
+  const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+    ? "audio/webm;codecs=opus"
+    : MediaRecorder.isTypeSupported("audio/webm")
+    ? "audio/webm"
+    : "";
+  const opts = mimeType ? { mimeType, audioBitsPerSecond: 128000 } : { audioBitsPerSecond: 128000 };
+  mediaRecorder = new MediaRecorder(audioStream, opts);
   mediaRecorder.ondataavailable = (e) => { if (e.data.size) recordedChunks.push(e.data); };
-  mediaRecorder.onstop = () => transcribeWithWhisper(key);
-  mediaRecorder.start();
+  mediaRecorder.onstop = () => {
+    const duration = Date.now() - startedAt;
+    if (duration < 1500) {
+      toast("ההקלטה קצרה מדי — דברו לפחות שנייה-שתיים");
+      return;
+    }
+    transcribeWithWhisper(key);
+  };
+  mediaRecorder.start(500); // collect data every 500ms for better chunks
 }
 
 async function transcribeWithWhisper(key) {
