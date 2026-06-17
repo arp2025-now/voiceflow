@@ -442,7 +442,7 @@ renderHistory();
 updateWordCount();
 setStatus("idle", "מוכן להקלטה");
 
-/* Auto-open settings if Whisper is selected but no key saved yet */
+/* If Whisper is selected and no key, show a gentle toast (don't block the UI) */
 if (el.engineSelect.value === "whisper" && !localStorage.getItem(LS_KEY)) {
-  openModal();
+  setTimeout(() => toast("לחצי על ⚙️ הגדרות מפתח API כדי להוסיף מפתח OpenAI"), 800);
 }
