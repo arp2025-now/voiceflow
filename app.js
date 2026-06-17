@@ -20,6 +20,7 @@ const el = {
   copyBtn: $("copyBtn"),
   downloadBtn: $("downloadBtn"),
   cleanBtn: $("cleanBtn"),
+  clearTextBtn: $("clearTextBtn"),
   newBtn: $("newBtn"),
   historyList: $("historyList"),
   historyEmpty: $("historyEmpty"),
@@ -383,7 +384,16 @@ el.cleanBtn.addEventListener("click", () => {
   if (!text) return;
   el.transcript.innerText = polishText(text);
   updateWordCount();
-  toast("הטקסט נוקה ✓");
+  toast("הטקסט שופר ✓");
+});
+
+el.clearTextBtn.addEventListener("click", () => {
+  if (!el.transcript.innerText.trim()) return toast("אין טקסט למחיקה");
+  if (!confirm("למחוק את הטקסט?")) return;
+  el.transcript.innerText = "";
+  el.interim.textContent = "";
+  updateWordCount();
+  toast("הטקסט נמחק ✓");
 });
 
 el.newBtn.addEventListener("click", () => {
