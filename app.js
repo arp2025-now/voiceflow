@@ -375,3 +375,8 @@ document.addEventListener("keydown", (e) => {
 renderHistory();
 updateWordCount();
 setStatus("idle", "מוכן להקלטה");
+
+/* Auto-open settings if Whisper is selected but no key saved yet */
+if (el.engineSelect.value === "whisper" && !localStorage.getItem(LS_KEY)) {
+  openModal();
+}
