@@ -133,9 +133,13 @@ async function startRecording() {
   el.interim.textContent = "";
   startTimer();
   startVisualizer(audioStream);
-  setStatus("recording", "מקליט… דברו עכשיו");
-  if (engine === "whisper") startWhisper();
-  else startBrowserRecognition();
+  if (engine === "whisper") {
+    setStatus("recording", "🔴 מקליט עם Whisper — דברו, הטקסט יופיע אחרי עצירה");
+    startWhisper();
+  } else {
+    setStatus("recording", "מקליט… דברו עכשיו");
+    startBrowserRecognition();
+  }
 }
 
 async function stopRecording() {
@@ -221,7 +225,8 @@ function startWhisper() {
 }
 
 async function transcribeWithWhisper(key) {
-  setStatus("processing", "מתמלל עם Whisper…");
+  setStatus("processing", "⏳ שולח ל-Whisper, רגע…");
+  toast("שולח ל-Whisper — ממתינה לתוצאה…");
   const blob = new Blob(recordedChunks, { type: "audio/webm" });
   const form = new FormData();
   form.append("file", blob, "audio.webm");
@@ -241,7 +246,8 @@ async function transcribeWithWhisper(key) {
     finalizeTranscript();
   } catch (e) {
     setStatus("idle", "מוכן להקלטה");
-    toast("שגיאת Whisper: " + e.message.slice(0, 80));
+    console.error("Whisper error:", e);
+    toast("שגיאת Whisper: " + e.message.slice(0, 120));
   }
 }
 
