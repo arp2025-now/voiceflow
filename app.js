@@ -380,7 +380,7 @@ el.downloadBtn.addEventListener("click", () => {
   URL.revokeObjectURL(a.href);
 });
 
-el.cleanBtn.addEventListener("click", () => {
+if (el.cleanBtn) el.cleanBtn.addEventListener("click", () => {
   const text = el.transcript.innerText.trim();
   if (!text) return;
   el.transcript.innerText = polishText(text);
@@ -388,7 +388,7 @@ el.cleanBtn.addEventListener("click", () => {
   toast("הטקסט שופר ✓");
 });
 
-el.clearTextBtn.addEventListener("click", () => {
+if (el.clearTextBtn) el.clearTextBtn.addEventListener("click", () => {
   if (!el.transcript.innerText.trim()) return toast("אין טקסט למחיקה");
   if (!confirm("למחוק את הטקסט?")) return;
   el.transcript.innerText = "";
